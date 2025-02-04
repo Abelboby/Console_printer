@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/lyrics",
+      "destination": "https://raw.githubusercontent.com/Abelboby/Console_printer/main/lyrics.ps1",
+      "statusCode": 302
+    }
+  ]
+} 
