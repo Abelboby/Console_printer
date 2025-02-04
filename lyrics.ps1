@@ -16,7 +16,7 @@ try {
         $line = $_
         $chars = $line.ToCharArray()
         for($i=0; $i -lt $chars.Length; $i++) {
-            Write-Host $chars[$i] -NoNewline
+            Write-Host $chars[$i] -ForegroundColor Green -NoNewline
             Start-Sleep -Milliseconds 100
         }
         Write-Host ""
