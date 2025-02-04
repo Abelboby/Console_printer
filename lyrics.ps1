@@ -33,10 +33,6 @@ $musicUrl = "https://raw.githubusercontent.com/Abelboby/Console_printer/main/blu
 # $musicUrl = "https://cdn.jsdelivr.net/gh/Abelboby/Console_printer@main/blue.mp3"
 $tempFile = "$env:TEMP\blue.mp3"
 irm $musicUrl -OutFile $tempFile
-$player = New-Object -ComObject WMPLib.WindowsMediaPlayer
-$player.settings.volume = 100
-$player.URL = $tempFile
-$player.controls.play()
 
 $originalBg = $Host.UI.RawUI.BackgroundColor
 $originalFg = $Host.UI.RawUI.ForegroundColor
@@ -60,7 +56,15 @@ try {
     Start-Sleep -Seconds 5
 }
 finally {
-    $player.controls.stop()
+    Add-Type -AssemblyName PresentationCore
+    $mediaPlayer = New-Object System.Windows.Media.MediaPlayer
+    $mediaPlayer.Open($tempFile)
+    $mediaPlayer.Volume = 1.0
+    $mediaPlayer.Play()
+
+    $mediaPlayer.Stop()
+    $mediaPlayer.Close()
+
     $Host.UI.RawUI.BackgroundColor = $originalBg
     $Host.UI.RawUI.ForegroundColor = $originalFg
     Clear-Host
