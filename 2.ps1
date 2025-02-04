@@ -87,28 +87,8 @@ try {
         Write-Host ""
     }
 
-    # Display heart animation
-    $heartPattern = @(
-        "    ♥     ♥    ",
-        "   ♥ ♥   ♥ ♥   ",
-        "  ♥   ♥ ♥   ♥  ",
-        " ♥     ♥     ♥ ",
-        "♥             ♥",
-        " ♥           ♥ ",
-        "  ♥         ♥  ",
-        "   ♥       ♥   ",
-        "    ♥     ♥    ",
-        "      ♥ ♥      ",
-        "       ♥       "
-    )
-    
-    foreach ($line in $heartPattern) {
-        Write-Host $line -ForegroundColor Red
-        Start-Sleep -Milliseconds 150
-    }
-    
-    # Final sleep adjustment
-    $remainingTime = 221 - $targetTime - 1.65  # 3:41 = 221s, subtract animation time
+    # Final instrumental (2:44 to 3:41 = 57 seconds)
+    $remainingTime = 221 - $targetTime  # 3:41 = 221 seconds
     if ($remainingTime -gt 0) {
         Start-Sleep -Seconds $remainingTime
     }
