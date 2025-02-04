@@ -27,6 +27,17 @@ So let me fly with you
 Will you be forever with me?
 "@
 
+# Update music URL to GitHub raw
+$musicUrl = "https://raw.githubusercontent.com/Abelboby/Console_printer/main/blue.mp3"
+# Or use CDN version (better reliability):
+# $musicUrl = "https://cdn.jsdelivr.net/gh/Abelboby/Console_printer@main/blue.mp3"
+$tempFile = "$env:TEMP\blue.mp3"
+irm $musicUrl -OutFile $tempFile
+$player = New-Object -ComObject WMPLib.WindowsMediaPlayer
+$player.settings.volume = 100
+$player.URL = $tempFile
+$player.controls.play()
+
 $originalBg = $Host.UI.RawUI.BackgroundColor
 $originalFg = $Host.UI.RawUI.ForegroundColor
 
@@ -46,10 +57,12 @@ try {
         Start-Sleep -Seconds 2
     }
 
-    Start-Sleep -Seconds 5  # Final delay after all lyrics
+    Start-Sleep -Seconds 5
 }
 finally {
+    $player.controls.stop()
     $Host.UI.RawUI.BackgroundColor = $originalBg
     $Host.UI.RawUI.ForegroundColor = $originalFg
     Clear-Host
+    Remove-Item $tempFile -ErrorAction SilentlyContinue
 } 
