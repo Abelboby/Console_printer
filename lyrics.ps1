@@ -22,6 +22,8 @@ try {
         Write-Host ""
         Start-Sleep -Seconds 2
     }
+
+    Start-Sleep -Seconds 5  # Final delay after all lyrics
 }
 finally {
     $Host.UI.RawUI.BackgroundColor = $originalBg
