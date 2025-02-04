@@ -9,7 +9,7 @@ $originalFg = $Host.UI.RawUI.ForegroundColor
 
 try {
     $Host.UI.RawUI.BackgroundColor = "Black"
-    $Host.UI.RawUI.ForegroundColor = "White"
+    $Host.UI.RawUI.ForegroundColor = "Green"
     Clear-Host
     
     $lyrics -split "`n" | ForEach-Object {
