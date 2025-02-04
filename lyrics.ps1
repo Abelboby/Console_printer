@@ -1,4 +1,10 @@
 $lyrics = @"
+
+uhmm... just a little bit of my mischief working to make you smile :)
+........................................................
+...................................................
+............................................
+
 Your morning eyes, I could stare like watching stars
 I could walk you by, and I'll tell without a thought
 You'd be mine, would you mind if I took your hand tonight?
@@ -34,6 +40,14 @@ $musicUrl = "https://raw.githubusercontent.com/Abelboby/Console_printer/main/blu
 $tempFile = "$env:TEMP\blue.mp3"
 irm $musicUrl -OutFile $tempFile
 
+# Audio initialization
+Add-Type -AssemblyName PresentationCore
+$mediaPlayer = New-Object System.Windows.Media.MediaPlayer
+$mediaPlayer.Open($tempFile)
+$mediaPlayer.Volume = 1.0
+$mediaPlayer.Play()
+Start-Sleep -Milliseconds 500  # Let audio buffer
+
 $originalBg = $Host.UI.RawUI.BackgroundColor
 $originalFg = $Host.UI.RawUI.ForegroundColor
 
@@ -56,17 +70,11 @@ try {
     Start-Sleep -Seconds 5
 }
 finally {
-    Add-Type -AssemblyName PresentationCore
-    $mediaPlayer = New-Object System.Windows.Media.MediaPlayer
-    $mediaPlayer.Open($tempFile)
-    $mediaPlayer.Volume = 1.0
-    $mediaPlayer.Play()
-
     $mediaPlayer.Stop()
     $mediaPlayer.Close()
+    Remove-Item $tempFile -ErrorAction SilentlyContinue
 
     $Host.UI.RawUI.BackgroundColor = $originalBg
     $Host.UI.RawUI.ForegroundColor = $originalFg
     Clear-Host
-    Remove-Item $tempFile -ErrorAction SilentlyContinue
 } 
