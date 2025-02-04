@@ -20,7 +20,6 @@ try {
 
     # Timestamp to seconds mapping
     $lyricData = @(
-        (2, "uhm... idk if u will find this cringe, but ima do this still :), jst like every other decision ima take for u, regardless of the consequences.  <3`n `n"),
         (19, "Your morning eyes, I could stare like watching stars"),
         (26, "I could walk you by and I'll tell without a thought"),
         (33, "You'd be mine, would you mind if I took your hand tonight"),
@@ -87,28 +86,8 @@ try {
         Write-Host ""
     }
 
-    # Display heart animation
-    $heartPattern = @(
-        "    ♥     ♥    ",
-        "   ♥ ♥   ♥ ♥   ",
-        "  ♥   ♥ ♥   ♥  ",
-        " ♥     ♥     ♥ ",
-        "♥             ♥",
-        " ♥           ♥ ",
-        "  ♥         ♥  ",
-        "   ♥       ♥   ",
-        "    ♥     ♥    ",
-        "      ♥ ♥      ",
-        "       ♥       "
-    )
-    
-    foreach ($line in $heartPattern) {
-        Write-Host $line -ForegroundColor Red
-        Start-Sleep -Milliseconds 150
-    }
-    
-    # Final sleep adjustment
-    $remainingTime = 221 - $targetTime - 1.65  # 3:41 = 221s, subtract animation time
+    # Final instrumental (2:44 to 3:41 = 57 seconds)
+    $remainingTime = 221 - $targetTime  # 3:41 = 221 seconds
     if ($remainingTime -gt 0) {
         Start-Sleep -Seconds $remainingTime
     }
