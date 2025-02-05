@@ -23,21 +23,21 @@ try {
         (19, "Your morning eyes, I could stare like watching stars"),
         (26, "I could walk you by and I'll tell without a thought"),
         (33, "You'd be mine, would you mind if I took your hand tonight"),
-        (40, "Know you're all that I want, this life"),
+        (40, "Know you're all that I want, this life`n"),
         (48, "I'll imagine we fell in love"),
         (50, "I'll nap under moonlight skies with you"),
         (55, "I think I'll picture us, you with the waves"),
         (58, "The ocean's colors on your face"),
         (62, "I'll leave my heart with your air"),  # 1:02
         (66, "So let me fly with you"),             # 1:06
-        (69, "Will you be forever with me"),        # 1:09
+        (69, "Will you be forever with me`n"),        # 1:09
         (107, "My love will always stay by you"),   # 1:47
         (113, "I'll keep it safe"),                 # 1:53
         (115, "So don't you worry a thing"),        # 1:55
         (118, "I'll tell you I love you more"),     # 1:58
         (121, "It's stuck with you forever"),       # 2:01
         (125, "So promise you won't let it go"),    # 2:05
-        (128, "I'll trust the universe will always bring me to you"), # 2:08
+        (128, "I'll trust the universe will always bring me to you`n"), # 2:08
         (137, "I'll imagine we fell in love"),      # 2:17
         (139, "I'll nap under moonlight skies with you"), # 2:19
         (143, "I think I'll picture us, you with the waves"), # 2:23
