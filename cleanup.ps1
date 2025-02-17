@@ -107,6 +107,65 @@ try {
     Write-Host "  Failed to delete: $failedToDeleteDirs" -ForegroundColor Yellow
     Write-Host "==================================================`n" -ForegroundColor Cyan
 
+    # Display drive space information
+    Write-Host "Drive Space Information" -ForegroundColor Cyan
+    Write-Host "======================" -ForegroundColor Cyan
+    
+    # Get Recycle Bin size
+    $recycleBinSize = 0
+    $shell = New-Object -ComObject Shell.Application
+    $recycleBin = $shell.Namespace(0xA)
+    
+    try {
+        $recycleBinItems = $recycleBin.Items()
+        foreach ($item in $recycleBinItems) {
+            $recycleBinSize += $item.Size
+        }
+        $recycleBinSizeGB = [math]::Round($recycleBinSize / 1GB, 2)
+        Write-Host "`nRecycle Bin Size: $recycleBinSizeGB GB" -ForegroundColor Yellow
+    }
+    catch {
+        Write-Host "`nCould not calculate Recycle Bin size" -ForegroundColor Red
+    }
+    
+    $drives = Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 }
+    $systemDrive = $env:SystemDrive
+    
+    foreach ($drive in $drives) {
+        $freeSpace = [math]::Round($drive.FreeSpace / 1GB, 2)
+        $totalSpace = [math]::Round($drive.Size / 1GB, 2)
+        $usedSpace = [math]::Round(($drive.Size - $drive.FreeSpace) / 1GB, 2)
+        $freePercent = [math]::Round(($drive.FreeSpace / $drive.Size) * 100, 1)
+        
+        # Highlight system drive
+        if ($drive.DeviceID -eq $systemDrive) {
+            Write-Host "`nSystem Drive $($drive.DeviceID) (OS Installed)" -ForegroundColor Yellow
+        } else {
+            Write-Host "`nDrive $($drive.DeviceID)" -ForegroundColor White
+        }
+        
+        Write-Host "  Total Space: $totalSpace GB"
+        Write-Host "  Used Space: $usedSpace GB"
+        
+        # Color code the free space status
+        $spaceStatus = if ($freePercent -ge 25) {
+            "Healthy"
+        } elseif ($freePercent -ge 15) {
+            "Warning"
+        } else {
+            "Critical"
+        }
+        
+        $statusColor = switch ($spaceStatus) {
+            "Healthy"  { "Green" }
+            "Warning"  { "Yellow" }
+            "Critical" { "Red" }
+        }
+        
+        Write-Host "  Free Space: $freeSpace GB ($freePercent% free) - $spaceStatus" -ForegroundColor $statusColor
+    }
+    Write-Host "==================================================`n" -ForegroundColor Cyan
+
     Write-Host "Cleanup completed!" -ForegroundColor Green
     
     # Display closing watermark
