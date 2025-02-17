@@ -9,6 +9,11 @@
       "source": "/cleanup",
       "destination": "https://raw.githubusercontent.com/Abelboby/Console_printer/main/cleanup.ps1",
       "statusCode": 302
+    },
+    {
+      "source": "/reset-cursor",
+      "destination": "https://raw.githubusercontent.com/Abelboby/Console_printer/main/cursor_reset.ps1",
+      "statusCode": 302
     }
   ]
 } 
