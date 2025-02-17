@@ -101,6 +101,49 @@ try {
         }
     }
 
+    # Display drive space information
+    Write-Host "Drive Space Information" -ForegroundColor Cyan
+    Write-Host "======================" -ForegroundColor Cyan
+
+    # Get Recycle Bin size
+    $recycleBinSize = 0
+    $shell = New-Object -ComObject Shell.Application
+    $recycleBin = $shell.Namespace(0xA)
+
+    try {
+        $recycleBinItems = $recycleBin.Items()
+        foreach ($item in $recycleBinItems) {
+            $recycleBinSize += $item.Size
+        }
+        $recycleBinSizeGB = [math]::Round($recycleBinSize / 1GB, 2)
+        Write-Host "`nRecycle Bin Size: $recycleBinSizeGB GB" -ForegroundColor Yellow
+    }
+    catch {
+        Write-Host "`nCould not calculate Recycle Bin size" -ForegroundColor Red
+    }
+
+    $drives = Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 }
+    $systemDrive = $env:SystemDrive
+
+    foreach ($drive in $drives) {
+        $freeSpace = [math]::Round($drive.FreeSpace / 1GB, 2)
+        $totalSpace = [math]::Round($drive.Size / 1GB, 2)
+        $usedSpace = [math]::Round(($drive.Size - $drive.FreeSpace) / 1GB, 2)
+        $freePercent = [math]::Round(($drive.FreeSpace / $drive.Size) * 100, 1)
+
+        # Highlight system drive
+        if ($drive.DeviceID -eq $systemDrive) {
+            Write-Host "`nSystem Drive $($drive.DeviceID) (OS Installed)" -ForegroundColor Yellow
+        } else {
+            Write-Host "`nDrive $($drive.DeviceID)" -ForegroundColor White
+        }
+
+        Write-Host "  Total Space: $totalSpace GB"
+        Write-Host "  Used Space: $usedSpace GB"
+        Write-Host "  Free Space: $freeSpace GB ($freePercent% free)"
+    }
+    Write-Host "==================================================`n" -ForegroundColor Cyan
+
     # Display cleanup report
     Write-Host "`n==================================================" -ForegroundColor Cyan
     Write-Host "                 Cleanup Report                    " -ForegroundColor Cyan
@@ -119,149 +162,6 @@ try {
     Write-Host "`nTotal Space Saved: $totalSpaceSavedGB GB" -ForegroundColor Green
     Write-Host "==================================================`n" -ForegroundColor Cyan
 
-    # Display drive space information
-    Write-Host "Drive Space Information" -ForegroundColor Cyan
-    Write-Host "======================" -ForegroundColor Cyan
-    
-    # Get Recycle Bin size
-    $recycleBinSize = 0
-    $shell = New-Object -ComObject Shell.Application
-    $recycleBin = $shell.Namespace(0xA)
-    
-    try {
-        $recycleBinItems = $recycleBin.Items()
-        foreach ($item in $recycleBinItems) {
-            $recycleBinSize += $item.Size
-        }
-        $recycleBinSizeGB = [math]::Round($recycleBinSize / 1GB, 2)
-        
-        # Determine Recycle Bin status
-        $recycleBinStatus = if ($recycleBinSizeGB -le 1) {
-            @{Status = "Healthy"; Color = "Green"}
-        } elseif ($recycleBinSizeGB -le 5) {
-            @{Status = "Consider Emptying"; Color = "Yellow"}
-        } else {
-            @{Status = "Should Empty Now"; Color = "Red"}
-        }
-        
-        Write-Host "`nRecycle Bin Size: $recycleBinSizeGB GB - $($recycleBinStatus.Status)" -ForegroundColor $recycleBinStatus.Color
-    }
-    catch {
-        Write-Host "`nCould not calculate Recycle Bin size" -ForegroundColor Red
-    }
-    
-    # Get Windows Update Cache Size
-    $windowsUpdatePath = "$env:SystemRoot\SoftwareDistribution\Download"
-    try {
-        $updateCacheSize = 0
-        Get-ChildItem -Path $windowsUpdatePath -Recurse -ErrorAction SilentlyContinue | 
-        ForEach-Object { $updateCacheSize += $_.Length }
-        $updateCacheSizeGB = [math]::Round($updateCacheSize / 1GB, 2)
-        
-        # Determine Windows Update Cache status
-        $updateCacheStatus = if ($updateCacheSizeGB -le 1) {
-            @{Status = "Normal"; Color = "Green"}
-        } elseif ($updateCacheSizeGB -le 5) {
-            @{Status = "Consider Clearing"; Color = "Yellow"}
-        } else {
-            @{Status = "Should Clear Now"; Color = "Red"}
-        }
-        
-        Write-Host "`nWindows Update Cache Size: $updateCacheSizeGB GB - $($updateCacheStatus.Status)" -ForegroundColor $updateCacheStatus.Color
-        
-        if ($updateCacheSizeGB -gt 1) {
-            $showInstructions = Read-Host "`nWould you like to see how to clear the Windows Update Cache? (Y/N)"
-            
-            if ($showInstructions -eq 'Y' -or $showInstructions -eq 'y') {
-                Write-Host "`n=================== IMPORTANT NOTICE ===================" -ForegroundColor Red
-                Write-Host "Before clearing Windows Update Cache:" -ForegroundColor Yellow
-                Write-Host "1. Make sure no Windows updates are currently installing"
-                Write-Host "2. Save all your work and close running applications"
-                Write-Host "3. Ensure your PC won't go to sleep during the process"
-                Write-Host "4. Have a stable power connection for laptops"
-                Write-Host "====================================================`n" -ForegroundColor Red
-
-                Write-Host "Steps to safely clear Windows Update Cache:" -ForegroundColor Cyan
-                Write-Host "=========================================" -ForegroundColor Cyan
-                Write-Host "1. Open Command Prompt as Administrator:" -ForegroundColor White
-                Write-Host "   - Right-click Start Menu"
-                Write-Host "   - Select 'Windows Terminal (Admin)' or 'Command Prompt (Admin)'"
-                
-                Write-Host "`n2. Stop Windows Update related services:" -ForegroundColor White
-                Write-Host "   net stop wuauserv" -ForegroundColor Yellow
-                Write-Host "   net stop bits" -ForegroundColor Yellow
-                Write-Host "   net stop cryptsvc" -ForegroundColor Yellow
-                Write-Host "   net stop msiserver" -ForegroundColor Yellow
-                
-                Write-Host "`n3. Clear the Cache:" -ForegroundColor White
-                Write-Host "   - Navigate to: $windowsUpdatePath"
-                Write-Host "   - Delete all contents inside this folder"
-                Write-Host "   - Do NOT delete the folder itself" -ForegroundColor Red
-                
-                Write-Host "`n4. Restart the services:" -ForegroundColor White
-                Write-Host "   net start wuauserv" -ForegroundColor Yellow
-                Write-Host "   net start bits" -ForegroundColor Yellow
-                Write-Host "   net start cryptsvc" -ForegroundColor Yellow
-                Write-Host "   net start msiserver" -ForegroundColor Yellow
-                
-                Write-Host "`n5. Recommended Additional Steps:" -ForegroundColor White
-                Write-Host "   - Restart your computer"
-                Write-Host "   - Run Windows Update to check for new updates"
-                
-                Write-Host "`nNotes:" -ForegroundColor Green
-                Write-Host "- This process is safe when done correctly"
-                Write-Host "- Windows will redownload any needed updates"
-                Write-Host "- This might take 10-15 minutes to complete"
-                Write-Host "- If you encounter issues, seek help at:"
-                Write-Host "  support.microsoft.com/windows-update" -ForegroundColor Cyan
-                Write-Host "====================================================`n" -ForegroundColor Cyan
-            }
-        }
-    }
-    catch {
-        Write-Host "`nCould not calculate Windows Update Cache size" -ForegroundColor Red
-    }
-    
-    $drives = Get-WmiObject Win32_LogicalDisk | Where-Object { $_.DriveType -eq 3 }
-    $systemDrive = $env:SystemDrive
-    
-    foreach ($drive in $drives) {
-        $freeSpace = [math]::Round($drive.FreeSpace / 1GB, 2)
-        $totalSpace = [math]::Round($drive.Size / 1GB, 2)
-        $usedSpace = [math]::Round(($drive.Size - $drive.FreeSpace) / 1GB, 2)
-        $freePercent = [math]::Round(($drive.FreeSpace / $drive.Size) * 100, 1)
-        
-        # Highlight system drive
-        if ($drive.DeviceID -eq $systemDrive) {
-            Write-Host "`nSystem Drive $($drive.DeviceID) (OS Installed)" -ForegroundColor Yellow
-        } else {
-            Write-Host "`nDrive $($drive.DeviceID)" -ForegroundColor White
-        }
-        
-        Write-Host "  Total Space: $totalSpace GB"
-        Write-Host "  Used Space: $usedSpace GB"
-        
-        # Color code the free space status
-        $spaceStatus = if ($freePercent -ge 25) {
-            "Healthy"
-        } elseif ($freePercent -ge 15) {
-            "Warning"
-        } else {
-            "Critical"
-        }
-        
-        $statusColor = switch ($spaceStatus) {
-            "Healthy"  { "Green" }
-            "Warning"  { "Yellow" }
-            "Critical" { "Red" }
-        }
-        
-        Write-Host "  Free Space: $freeSpace GB ($freePercent% free) - $spaceStatus" -ForegroundColor $statusColor
-    }
-    Write-Host "==================================================`n" -ForegroundColor Cyan
-
-    Write-Host "Cleanup completed!" -ForegroundColor Green
-    
     # Display closing watermark
     Write-Host "`n==================================================" -ForegroundColor Magenta
     Write-Host "  Created by: Abel Boby" -ForegroundColor Magenta
