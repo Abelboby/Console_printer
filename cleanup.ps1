@@ -108,6 +108,12 @@ try {
     Write-Host "==================================================`n" -ForegroundColor Cyan
 
     Write-Host "Cleanup completed!" -ForegroundColor Green
+    
+    # Display closing watermark
+    Write-Host "`n==================================================" -ForegroundColor Magenta
+    Write-Host "  Created by: Abel Boby" -ForegroundColor Magenta
+    Write-Host "  GitHub: github.com/abelboby" -ForegroundColor Magenta
+    Write-Host "==================================================`n" -ForegroundColor Magenta
 }
 catch {
     Write-Host "An error occurred during cleanup: $($_.Exception.Message)" -ForegroundColor Red
