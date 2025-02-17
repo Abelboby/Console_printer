@@ -144,8 +144,8 @@ try {
         $updateCacheSize = 0
         Get-ChildItem -Path $windowsUpdatePath -Recurse -ErrorAction SilentlyContinue | 
         ForEach-Object { $updateCacheSize += $_.Length }
-        # $updateCacheSizeGB = [math]::Round($updateCacheSize / 1GB, 2)
-        $updateCacheSizeGB = 6
+        $updateCacheSizeGB = [math]::Round($updateCacheSize / 1GB, 2)
+        
         # Determine Windows Update Cache status
         $updateCacheStatus = if ($updateCacheSizeGB -le 1) {
             @{Status = "Normal"; Color = "Green"}
