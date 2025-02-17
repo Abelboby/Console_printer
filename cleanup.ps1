@@ -37,6 +37,10 @@ try {
     $failedToDeleteFiles = 0
     $failedToDeleteDirs = 0
 
+    # Initialize space saved counters
+    $spaceSavedFiles = 0
+    $spaceSavedDirs = 0
+
     # Define paths to clean
     $tempPaths = @(
         "$env:TEMP",
@@ -61,11 +65,14 @@ try {
                 try {
                     if ($item.PSIsContainer) {
                         # For folders, try to remove entire directory and its contents
+                        $sizeBefore = [math]::Round((Get-ChildItem $item.FullName -Recurse -Force | Measure-Object -Property Length -Sum).Sum / 1GB, 2)
                         Remove-Item $item.FullName -Force -Recurse -ErrorAction SilentlyContinue
                         Write-Host "Removed directory: $($item.Name)" -ForegroundColor Green
                         $successfullyDeletedDirs++
+                        $spaceSavedDirs += $sizeBefore
                     } else {
                         # For files
+                        $sizeBefore = [math]::Round($item.Length / 1GB, 2)
                         # Try to force close any handles to the file
                         $handle = [System.IO.File]::Open($item.FullName, 'Open', 'Read', 'None')
                         $handle.Close()
@@ -74,6 +81,7 @@ try {
                         Remove-Item $item.FullName -Force -ErrorAction SilentlyContinue
                         Write-Host "Removed file: $($item.Name)" -ForegroundColor Green
                         $successfullyDeletedFiles++
+                        $spaceSavedFiles += $sizeBefore
                     }
                 }
                 catch {
@@ -105,6 +113,10 @@ try {
     Write-Host "  Total found: $totalDirectories" -ForegroundColor White
     Write-Host "  Successfully deleted: $successfullyDeletedDirs" -ForegroundColor Green
     Write-Host "  Failed to delete: $failedToDeleteDirs" -ForegroundColor Yellow
+
+    # Calculate total space saved
+    $totalSpaceSavedGB = [math]::Round(($spaceSavedFiles + $spaceSavedDirs), 2)
+    Write-Host "`nTotal Space Saved: $totalSpaceSavedGB GB" -ForegroundColor Green
     Write-Host "==================================================`n" -ForegroundColor Cyan
 
     # Display drive space information
