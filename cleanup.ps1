@@ -122,7 +122,17 @@ try {
             $recycleBinSize += $item.Size
         }
         $recycleBinSizeGB = [math]::Round($recycleBinSize / 1GB, 2)
-        Write-Host "`nRecycle Bin Size: $recycleBinSizeGB GB" -ForegroundColor Yellow
+        
+        # Determine Recycle Bin status
+        $recycleBinStatus = if ($recycleBinSizeGB -le 1) {
+            @{Status = "Healthy"; Color = "Green"}
+        } elseif ($recycleBinSizeGB -le 5) {
+            @{Status = "Consider Emptying"; Color = "Yellow"}
+        } else {
+            @{Status = "Should Empty Now"; Color = "Red"}
+        }
+        
+        Write-Host "`nRecycle Bin Size: $recycleBinSizeGB GB - $($recycleBinStatus.Status)" -ForegroundColor $recycleBinStatus.Color
     }
     catch {
         Write-Host "`nCould not calculate Recycle Bin size" -ForegroundColor Red
