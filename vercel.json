@@ -14,6 +14,11 @@
       "source": "/reset-cursor",
       "destination": "https://raw.githubusercontent.com/Abelboby/Console_printer/main/cursor_reset.ps1",
       "statusCode": 302
+    },
+    {
+      "source": "/fix-virtualization",
+      "destination": "https://raw.githubusercontent.com/Abelboby/Console_printer/main/fix_virtualization.ps1",
+      "statusCode": 302
     }
   ]
 } 
